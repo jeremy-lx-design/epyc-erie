@@ -36,7 +36,7 @@ namespace epyc_erie
             //mettre à 0 le montant
             montant.Text = String.Format(new CultureInfo("en-US"), "{0:C}", 0);
         }
-
+        //Bouton ajouté produit
         private void btSubmit_Click(object sender, RoutedEventArgs e)
         {
             //Vérifier validité du nom du produit
@@ -44,7 +44,7 @@ namespace epyc_erie
 
             //Vérifier validité de la qte
             bool valQte;
-            try {   valQte = !tbQte.Text.Contains("_") && int.Parse(tbQte.Text.Trim()) < 20 && int.Parse(tbQte.Text.Trim()) > 0;} 
+            try {   valQte = !tbQte.Text.Contains("_") && int.Parse(tbQte.Text.Trim()) <= 20 && int.Parse(tbQte.Text.Trim()) > 0;} 
             catch { valQte = false;}
 
             //Vérifier validité du prix
@@ -85,7 +85,14 @@ namespace epyc_erie
                 }
                 else
                 {
-                    montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Black);
+                    if (Windows.UI.Xaml.Application.Current.RequestedTheme == ApplicationTheme.Dark)
+                    {
+                        montant.Foreground = new SolidColorBrush(Windows.UI.Colors.White);
+                    }
+                    else
+                    {
+                        montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Black);
+                    }
                 }
 
                 //réinitialiser les champs
@@ -95,7 +102,7 @@ namespace epyc_erie
                 
             }
         }
-
+        //Bouton ajouter crédit
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
             //afficher le dialog ajoutercredit
@@ -108,14 +115,21 @@ namespace epyc_erie
             //changer la couleur du montant en fonction du crédit
             if (credit > 0)
             {
-                montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Black);
+                if (Windows.UI.Xaml.Application.Current.RequestedTheme == ApplicationTheme.Dark)
+                {
+                    montant.Foreground = new SolidColorBrush(Windows.UI.Colors.White);
+                }
+                else
+                {
+                    montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Black);
+                }
             }
             else
             {
                 montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Red);
             }
         }
-
+        //Bouton achat
         private async void AppBarButton_Click_1(object sender, RoutedEventArgs e)
         {
             //sum of all items in cart
@@ -152,9 +166,17 @@ namespace epyc_erie
 
                 //mettre à 0 le montant
                 montant.Text = String.Format(new CultureInfo("en-CA"), "{0:C}", 0);
+
+                //Afficher un message de confirmation
+                ContentDialog dialog = new ContentDialog()
+                {
+                    Title = "Achat réussi",
+                    Content = "Votre achat a été effectué avec succès",
+                    CloseButtonText = "OK"
+                };
             }
         }
-
+        //Bouton supprimer
         private void AppBarButton_Click_2(object sender, RoutedEventArgs e)
         {
             //Vérifier qu'il y a un item sélectionné
@@ -164,6 +186,30 @@ namespace epyc_erie
                 cart.Remove((item)lvProduits.SelectedItem);
                 lvProduits.ItemsSource = null;
                 lvProduits.ItemsSource = cart;
+                //mettre à jour le montant total après suppression de l'item sélectionné
+                double total = 0.0;
+                foreach (item i in cart)
+                {
+                    total += i.Prix * i.Qte;
+                }
+                montant.Text = String.Format(new CultureInfo("en-CA"), "{0:C}", total);
+
+                //changer la couleur du montant en fonction du crédit
+                if (credit > 0)
+                {
+                    if (Windows.UI.Xaml.Application.Current.RequestedTheme == ApplicationTheme.Dark)
+                    {
+                        montant.Foreground = new SolidColorBrush(Windows.UI.Colors.White);
+                    }
+                    else
+                    {
+                        montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Black);
+                    }
+                }
+                else
+                {
+                    montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Red);
+                }
             }
         }
 

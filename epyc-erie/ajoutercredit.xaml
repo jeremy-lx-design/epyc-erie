@@ -14,9 +14,12 @@
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
 
     <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,10,0">
-            <TextBlock Text="Prix:" Margin="2,6,2,2" VerticalAlignment="Center"/>
-            <TextBox x:Name="tbCredit" ui:TextBoxExtensions.Mask="9999.99" Width="200"/>
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,10,0">
+                <TextBlock Text="Prix:" Margin="2,6,2,2" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbCredit" ui:TextBoxExtensions.Mask="9999.99" Width="200"/>
+            </StackPanel>
+            <TextBlock x:Name="errorPrix" Text="Veuillez entrer un crédit supérieur à 0" Foreground="red" Visibility="Collapsed" HorizontalAlignment="Right"/>
         </StackPanel>
     </Grid>
 </ContentDialog>

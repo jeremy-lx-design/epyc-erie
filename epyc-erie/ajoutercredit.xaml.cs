@@ -32,10 +32,17 @@ namespace epyc_erie
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+
             if (!string.IsNullOrEmpty(tbCredit.Text) && !tbCredit.Text.Contains("_"))
             {
                 rootPage.credit += Double.Parse(tbCredit.Text.Trim().Replace(".", ","));
-            }   
+            }
+            else
+            {
+                args.Cancel = true;
+                errorPrix.Visibility = Visibility.Visible;
+                errorPrix.Text = "Veuillez entrer un prix supérieur à 0";
+            }
         }
     }
 }
