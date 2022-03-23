@@ -13,10 +13,18 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <CommandBar Grid.Row="0" DefaultLabelPosition="Right">
-            <AppBarButton Icon="Add" Label="Ajouter du crédit"/>
-            <AppBarButton Icon="Accept" Label="Acheter le panier"/>
+            <AppBarElementContainer VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Crédit: "></TextBlock>
+                    <TextBlock Text="" Name="creditTag"></TextBlock>
+                </StackPanel>
+            </AppBarElementContainer>
+            <AppBarButton x:Name="btDelete" Icon="Delete" Label="Suprimer l'item" Click="AppBarButton_Click_2"/>
+            <AppBarButton Icon="Add" Label="Ajouter du crédit" Click="AppBarButton_Click"/>
+            <AppBarButton Icon="Accept" Label="Acheter le panier" Click="AppBarButton_Click_1"/>
         </CommandBar>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -26,44 +34,40 @@
 
             <StackPanel Orientation="Vertical" Grid.Column="0">
                 <TextBlock Text="Ajouter un produit" FontSize="40" FontFamily="stencil" Foreground="SlateGray" HorizontalAlignment="Right"/>
-                <TextBlock x:Name="errorNom" Text="Veuillez entrer un nom valide" Foreground="red" Visibility="Collapsed"/>
+                <TextBlock x:Name="errorNom" Text="Veuillez entrer un nom valide" Foreground="red" Visibility="Collapsed" HorizontalAlignment="Right"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,10,0">
                     <TextBlock Text="Nom:" Margin="2,6,2,2" VerticalAlignment="Center"/>
                     <TextBox x:Name="tbNom" PlaceholderText="Pâte de tomates" Width="200" MaxLength="255"/>
                 </StackPanel>
-                <TextBlock x:Name="errorQte" Text="Veuillez entrer une valide (entre 1 et 20)" Foreground="red" Visibility="Collapsed"/>
+                <TextBlock x:Name="errorQte" Text="Veuillez entrer une quantité valide (entre 1 et 20)" Foreground="red" Visibility="Collapsed" HorizontalAlignment="Right"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,10,0">
                     <TextBlock Text="Qte:" Margin="2,6,2,2" VerticalAlignment="Center"/>
                     <TextBox x:Name="tbQte" ui:TextBoxExtensions.Mask="99" Width="200"/>
                 </StackPanel>
-                <TextBlock x:Name="errorPrix" Text="Veuillez entrer un prix valide (plus grand que 0$)" Foreground="red" Visibility="Collapsed"/>
+                <TextBlock x:Name="errorPrix" Text="Veuillez entrer un prix valide (plus grand que 0$)" Foreground="red" Visibility="Collapsed" HorizontalAlignment="Right"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,10,0">
                     <TextBlock Text="Prix:" Margin="2,6,2,2" VerticalAlignment="Center"/>
                     <TextBox x:Name="tbPrix" ui:TextBoxExtensions.Mask="9999.99" Width="200"/>
                 </StackPanel>
-                <Button x:Name="btSubmit" Content="Ajouter" Margin="0,12,0,0" Click="btSubmit_Click"/>
+                <Button x:Name="btSubmit" Content="Ajouter" Margin="0,12,0,0" Click="btSubmit_Click" HorizontalAlignment="Right"/>
             </StackPanel>
-            
-            <StackPanel Orientation="Vertical" Grid.Column="1">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
                 <TextBlock Text="Votre panier" FontSize="40" FontFamily="stencil" Foreground="SlateGray" HorizontalAlignment="Right"/>
-                <ListView x:Name="lvProduits">
+                <ListView x:Name="lvProduits" SelectionChanged="lvProduits_SelectionChanged" HorizontalAlignment="Right">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Image Source="{Binding ImgObject}" Grid.Column="0"/>
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
-                                    <TextBlock Text="{Binding Qte}" FontWeight="Normal" FontSize="12"/>
-                                    <TextBlock Text="{Binding Prix}" FontWeight="Normal" FontSize="12"/>
-                                </StackPanel>
-                            </Grid>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
+                                <TextBlock Text="{Binding Qte}" FontWeight="Normal" FontSize="12"/>
+                                <TextBlock Text="{Binding Prix}" FontWeight="Normal" FontSize="12"/>
+                            </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="2" Grid.Column="1">
+                <TextBlock Text="Total du panier: " FontSize="26" FontWeight="Bold" VerticalAlignment="Bottom" Margin="4,4,8,4"/>
+                <TextBlock Text="" Name="montant" FontSize="26" VerticalAlignment="Bottom" FontWeight="Bold" Margin="4,4,8,4"/>
             </StackPanel>
         </Grid>
     </Grid>

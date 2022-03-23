@@ -16,59 +16,27 @@ using Microsoft.Toolkit.Collections;
 using System.Globalization;
 using System.Net;
 
-// Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
 namespace epyc_erie
 {
-    /// <summary>
-    /// Page unique de l'interface utilisateur.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
 
         List<item> cart = new List<item>();
+        public double credit = 100.00;
 
         public MainPage()
         {
             this.InitializeComponent();
             lvProduits.ItemsSource = cart;
+            //format credit to currency
+            creditTag.Text = String.Format(new CultureInfo("en-US"), "{0:C}", credit);
+            //désactiver le bouton supprimer
+            btDelete.IsEnabled = false;
+
+            //mettre à 0 le montant
+            montant.Text = String.Format(new CultureInfo("en-US"), "{0:C}", 0);
         }
 
-
-        public static int GetStatus(String url)
-        {
-            try
-            {
-                // Créer une requête HTTP
-                HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-
-                // Récupérer le code de status
-                HttpWebResponse myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                int code = (int)myHttpWebResponse.StatusCode;
-
-                // Fermer la requête http
-                myHttpWebResponse.Close();
-
-                // Retourner le code de status
-                return code;
-            }
-            catch (WebException e)
-            {
-                return 999;
-            }
-            catch (Exception e)
-            {
-                return 999;
-            }
-
-            
-        }
-
-        /// <summary>
-        /// Fonction de clic du boutton ajouter
-        /// </summary>
-        /// <param name="sender">Bouton cliqué</param>
-        /// <param name="e">Évènement du clic</param>
         private void btSubmit_Click(object sender, RoutedEventArgs e)
         {
             //Vérifier validité du nom du produit
@@ -101,6 +69,114 @@ namespace epyc_erie
                 cart.Add(new item(tbNom.Text.Trim(), int.Parse(tbQte.Text.Trim()), double.Parse(tbPrix.Text.Trim(), CultureInfo.InvariantCulture)));
                 lvProduits.ItemsSource = null;
                 lvProduits.ItemsSource = cart;
+
+                //mettre à jour le montant total
+                double total = 0.0;
+                foreach (item i in cart)
+                {
+                    total += i.Qte * i.Prix;
+                }
+                montant.Text = String.Format(new CultureInfo("en-CA"), "{0:C}", total);
+
+                //mettre le montant en rouge si le montant total est supérieur au crédit
+                if (total > credit)
+                {
+                    montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Red);
+                }
+                else
+                {
+                    montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Black);
+                }
+
+                //réinitialiser les champs
+                tbNom.Text = "";
+                tbQte.Text = "";
+                tbPrix.Text = "";
+                
+            }
+        }
+
+        private async void AppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+            //afficher le dialog ajoutercredit
+            ContentDialog dialog = new ajoutercredit(this);
+            await dialog.ShowAsync();
+
+            //mettre à jour le credit
+            creditTag.Text = String.Format(new CultureInfo("en-CA"), "{0:C}", credit);
+
+            //changer la couleur du montant en fonction du crédit
+            if (credit > 0)
+            {
+                montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Black);
+            }
+            else
+            {
+                montant.Foreground = new SolidColorBrush(Windows.UI.Colors.Red);
+            }
+        }
+
+        private async void AppBarButton_Click_1(object sender, RoutedEventArgs e)
+        {
+            //sum of all items in cart
+            double total = 0.0;
+            foreach (item i in cart)
+            {
+                total += i.Prix * i.Qte;
+            }
+
+            //verify if credit is enough
+            if (total > credit)
+            {
+                //Affichage d'un message d'erreur
+                ContentDialog dialog = new ContentDialog()
+                {
+                    Title = "Pas assez d'argent",
+                    Content = "Vous n'avez pas assez d'argent pour payer cette commande",
+                    CloseButtonText = "OK"
+                };
+                await dialog.ShowAsync();
+            }
+            else
+            {
+                //afficher le reste du credit
+                creditTag.Text = String.Format(new CultureInfo("en-CA"), "{0:C}", credit - total);
+                //vider le panier
+                cart.Clear();
+                //soustraire le total du credit
+                credit -= total;
+
+                //afficher le panier
+                lvProduits.ItemsSource = null;
+                lvProduits.ItemsSource = cart;
+
+                //mettre à 0 le montant
+                montant.Text = String.Format(new CultureInfo("en-CA"), "{0:C}", 0);
+            }
+        }
+
+        private void AppBarButton_Click_2(object sender, RoutedEventArgs e)
+        {
+            //Vérifier qu'il y a un item sélectionné
+            if (lvProduits.SelectedItem != null)
+            {
+                //Supprimer l'item sélectionné
+                cart.Remove((item)lvProduits.SelectedItem);
+                lvProduits.ItemsSource = null;
+                lvProduits.ItemsSource = cart;
+            }
+        }
+
+        private void lvProduits_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //désactiver le bouton supprimer si aucun item n'est sélectionné
+            if (lvProduits.SelectedItem == null)
+            {
+                btDelete.IsEnabled = false;
+            }
+            else
+            {
+                btDelete.IsEnabled = true;
             }
         }
     }
